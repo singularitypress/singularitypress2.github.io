@@ -42,3 +42,11 @@
 
 @include motion-ui-transitions;
 @include motion-ui-animations;
+
+$main-colour: #0b3454;
+
+.header {
+    background-color: $main-colour;
+    color: white;
+    padding: 10px 10px 10px 10px;
+}
