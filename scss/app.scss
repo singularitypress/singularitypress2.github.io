@@ -50,3 +50,17 @@ $main-colour: #0b3454;
     color: white;
     padding: 10px 10px 10px 10px;
 }
+
+.body {
+    width: 100%;
+    min-height: 100%;
+    background:
+        linear-gradient(
+            rgba(11, 50, 83, 0.8),
+            rgba(11, 50, 83, 0.8)
+        ),
+        url("http://40.media.tumblr.com/9044db9096d16a33af8c4c84b4f809d8/tumblr_nyg9byC1331rdrn22o1_1280.jpg");
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
