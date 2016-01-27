@@ -60,7 +60,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// Takes the "Render" data from App.js and sends it to the document here.
+	// Takes the "Render" data from App.js and
 	_reactDom2.default.render(_react2.default.createElement(_App2.default, null), document.getElementById('app'));
 
 /***/ },
@@ -19667,12 +19667,16 @@
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	    value: true
 	});
 
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19682,29 +19686,142 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/*
+	The render method can only return one HTML (actually JSX but whatever) tag. So
+	if we returned <i></i> <b></b>, then the browser would shit its pants. In this
+	case it would have been better to wrap the <i> and <b> tags into a containing
+	div to hold both so that return only actually returns one thing.
+
+	Also, it's good to wrap your HTML (actually JSX, yes) content in ( ); to freely
+	utilize whitespace. If you don't use the parenthesis with semicolon, the browser
+	predictably shits the bed by rendering nothing.
+
+	Props, mostly static values passed to components for use, states to be managed by
+	components themselves.
+
+	The constructor acts like it did in C++ if you remember, when a class is instantiated
+	as an object in C++ the constructor would run. Similarly when we use the App class,
+	the constructor initializes this.state as {txt: 'this is the state text'}. Since the
+	render function returns this.state.txt, it's like it's returning the default value.
+
+	updateTheState is a custom method. e = event, so event's target value
+
+	for <input type="text" onChange={this.updateTheState.bind(this)} />, we're binding the
+	updates to the input field to "txt:" through this.updateTheState.
+
+	By moving:
+	<div>
+	    <input type="text" onChange={props.updateTheState} />
+	    <div>{props.txt}</div>
+	</div>
+	into the WIDGET const, we can turn that into a... widget of sorts. So when you look at render,
+	you can just repeat the widget a bunch of times using less code. Composit component since it's
+	an immediate relative/child of App.
+
+	ReactDOM.findDOMNode(this.ref.red).value will reach out to the DOM and go to the input
+	where the ref is to red and pull its value.
+	*/
+
 	var App = function (_React$Component) {
-	  _inherits(App, _React$Component);
+	    _inherits(App, _React$Component);
 
-	  function App() {
-	    _classCallCheck(this, App);
+	    function App() {
+	        _classCallCheck(this, App);
 
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).apply(this, arguments));
-	  }
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
 
-	  _createClass(App, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        'Hi'
-	      );
+	        _this.state = {
+	            red: 0,
+	            green: 0,
+	            blue: 0
+	        };
+	        return _this;
 	    }
-	  }]);
 
-	  return App;
+	    _createClass(App, [{
+	        key: 'updateTheState',
+	        value: function updateTheState(e) {
+	            this.setState({
+	                red: _reactDom2.default.findDOMNode(this.refs.red.refs.inp).value,
+	                green: _reactDom2.default.findDOMNode(this.refs.green.refs.inp).value,
+	                blue: _reactDom2.default.findDOMNode(this.refs.blue.refs.inp).value
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(Slider, { ref: 'red', sliderUpdateTheState: this.updateTheState }),
+	                this.state.red,
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(Slider, { ref: 'green', sliderUpdateTheState: this.updateTheState }),
+	                this.state.green,
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(Slider, { ref: 'blue', sliderUpdateTheState: this.updateTheState }),
+	                this.state.blue,
+	                _react2.default.createElement('br', null)
+	            );
+	        }
+	    }]);
+
+	    return App;
 	}(_react2.default.Component);
 
+	var Slider = function (_React$Component2) {
+	    _inherits(Slider, _React$Component2);
+
+	    function Slider() {
+	        _classCallCheck(this, Slider);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Slider).apply(this, arguments));
+	    }
+
+	    _createClass(Slider, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement('input', { ref: 'inp', type: 'range',
+	                    min: '0',
+	                    max: '255',
+	                    onChange: this.props.updateTheState })
+	            );
+	        }
+	    }]);
+
+	    return Slider;
+	}(_react2.default.Component);
+
+	// I used h1 here instead of having the text appear in a div alone since it wasn't
+	// rendering the text when I tried the latter way. Using proper h1 or even p tags
+	// worked fine though.
+
+	var WIDGET = function WIDGET(props) {
+	    return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement('input', { type: 'text', onChange: props.widgetUpdateTheState }),
+	        _react2.default.createElement(
+	            'h1',
+	            null,
+	            props.widgetTxt
+	        )
+	    );
+	};
+
+	// App.propTypes = {
+	//     txt: React.PropTypes.string
+	// }
+	//
+	// App.defaultProps ={
+	//     txt: 'this is default text'
+	// }
+
+	// Stateless function:
+	// const App = () => <div>Hi</div>
 	exports.default = App;
 
 /***/ }
