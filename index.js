@@ -19664,10 +19664,12 @@
 
 	'use strict';
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 
 	var _react = __webpack_require__(1);
@@ -19720,97 +19722,250 @@
 
 	ReactDOM.findDOMNode(this.ref.red).value will reach out to the DOM and go to the input
 	where the ref is to red and pull its value.
-	*/
+	// */
+	// class App extends React.Component {
+	//   render(){
+	//     return <Bttn>React</Bttn>
+	//   }
+	// }
+	// // this.props.children here refers to the data inside the <Bttn> tags- in this case "React"
+	// class Bttn extends React.Component {
+	//   render(){
+	//     return <button>{this.props.children}</button>
+	//   }
+	// }
 
-	var App = function (_React$Component) {
-	    _inherits(App, _React$Component);
+	// class App extends React.Component {
+	//     constructor() {
+	//         super();
+	//         this.state = { val: 0 };
+	//         this.update = this.update.bind(this);
+	//     }
+	//     update(){
+	//         this.setState({val: this.state.val +1});
+	//     }
+	//     componentWillMount(){
+	//         this.setState({m: 2})
+	//     }
+	//     render(){
+	//         console.log('rendering');
+	//         return(
+	//             // the button runs this.update method onClick. The data the button shows us is val.
+	//             <button onClick={this.update}>{this.state.val *this.state.m}</button>
+	//         );
+	//     }
+	//     componentDidMount(){
+	//         this.inc = setInterval(this.update,500);
+	//     }
+	//     componentWillUnmount(){
+	//         clearInterval(this.inc);
+	//     }
+	// }
+	//
+	// class Wrapper extends React.Component {
+	//     constructor(){
+	//         super();
+	//     }
+	//     mount(){
+	//         ReactDOM.render(<App />, document.getElementById('a'));
+	//     }
+	//     unmount(){
+	//         ReactDOM.unmountComponentAtNode(document.getElementById('a'));
+	//     }
+	//     render(){
+	//         return (
+	//             <div>
+	//               <button onClick={this.mount.bind(this)}>Mount</button>
+	//               <button onClick={this.unmount.bind(this)}>Unmount</button>
+	//               <div id="a"></div>
+	//             </div>
+	//         );
+	//     }
+	// }
 
-	    function App() {
-	        _classCallCheck(this, App);
+	var Mixin = function Mixin(InnerComponent) {
+	  return function (_React$Component) {
+	    _inherits(_class, _React$Component);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
+	    function _class() {
+	      _classCallCheck(this, _class);
 
-	        _this.state = {
-	            red: 0,
-	            green: 0,
-	            blue: 0
-	        };
-	        return _this;
+	      var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this));
+
+	      _this.update = _this.update.bind(_this);
+	      _this.state = { val: 0 };
+	      return _this;
 	    }
 
-	    _createClass(App, [{
-	        key: 'updateTheState',
-	        value: function updateTheState(e) {
-	            this.setState({
-	                red: _reactDom2.default.findDOMNode(this.refs.red.refs.inp).value,
-	                green: _reactDom2.default.findDOMNode(this.refs.green.refs.inp).value,
-	                blue: _reactDom2.default.findDOMNode(this.refs.blue.refs.inp).value
-	            });
-	        }
+	    _createClass(_class, [{
+	      key: 'update',
+	      value: function update() {
+	        this.setState({ val: this.state.val + 1 });
+	      }
 	    }, {
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                null,
-	                _react2.default.createElement(Slider, { ref: 'red', sliderUpdateTheState: this.updateTheState }),
-	                this.state.red,
-	                _react2.default.createElement('br', null),
-	                _react2.default.createElement(Slider, { ref: 'green', sliderUpdateTheState: this.updateTheState }),
-	                this.state.green,
-	                _react2.default.createElement('br', null),
-	                _react2.default.createElement(Slider, { ref: 'blue', sliderUpdateTheState: this.updateTheState }),
-	                this.state.blue,
-	                _react2.default.createElement('br', null)
-	            );
-	        }
+	      key: 'componentWillMount',
+	      value: function componentWillMount() {
+	        console.log('will mount');
+	      }
+	    }, {
+	      key: 'render',
+	      value: function render() {
+	        return _react2.default.createElement(InnerComponent, _extends({
+	          update: this.update
+	        }, this.state, this.props));
+	      }
+	    }, {
+	      key: 'componentDidMount',
+	      value: function componentDidMount() {
+	        console.log('mounted');
+	      }
 	    }]);
 
-	    return App;
-	}(_react2.default.Component);
+	    return _class;
+	  }(_react2.default.Component);
+	};
 
-	var Slider = function (_React$Component2) {
-	    _inherits(Slider, _React$Component2);
+	var Button = function Button(props) {
+	  return _react2.default.createElement(
+	    'button',
+	    {
+	      onClick: props.update },
+	    props.txt,
+	    ' - ',
+	    props.val
+	  );
+	};
 
-	    function Slider() {
-	        _classCallCheck(this, Slider);
+	var Label = function Label(props) {
+	  return _react2.default.createElement(
+	    'label',
+	    {
+	      onMouseMove: props.update },
+	    props.txt,
+	    ' - ',
+	    props.val
+	  );
+	};
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Slider).apply(this, arguments));
+	var ButtonMixed = Mixin(Button);
+	var LabelMixed = Mixin(Label);
+
+	var App = function (_React$Component2) {
+	  _inherits(App, _React$Component2);
+
+	  function App() {
+	    _classCallCheck(this, App);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).apply(this, arguments));
+	  }
+
+	  _createClass(App, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(ButtonMixed, { txt: 'Button' }),
+	        _react2.default.createElement(LabelMixed, { txt: 'Label' })
+	      );
 	    }
+	  }]);
 
-	    _createClass(Slider, [{
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                null,
-	                _react2.default.createElement('input', { ref: 'inp', type: 'range',
-	                    min: '0',
-	                    max: '255',
-	                    onChange: this.props.updateTheState })
-	            );
-	        }
-	    }]);
-
-	    return Slider;
+	  return App;
 	}(_react2.default.Component);
+
+	// class App extends React.Component {
+	//   constructor(){
+	//     super();
+	//     this.update = this.update.bind(this);
+	//     this.state = {increasing: false}
+	//   }
+	//
+	//   // .setProps has been depricated we rerender the button instead
+	//   // https://facebook.github.io/react/blog/2015/10/07/react-v0.14.html#new-deprecations-introduced-with-a-warning
+	//   update(){
+	//     ReactDOM.render(
+	//       <App val={this.props.val+1} />,
+	//       document.getElementById('app')
+	//     );
+	//   }
+	//   componentWillReceiveProps(nextProps){
+	//     this.setState({increasing: nextProps.val > this.props.val})
+	//   }
+	//   shouldComponentUpdate(nextProps, nextState) {
+	//     return nextProps.val % 5 === 0;
+	//   }
+	//   render(){
+	//     console.log(this.state.increasing)
+	//     return (
+	//       <button onClick={this.update}>
+	//         {this.props.val}
+	//       </button>)
+	//   }
+	//   componentDidUpdate(prevProps, prevState) {
+	//     console.log('prevProps', prevProps)
+	//   }
+	// }
+	//
+	// App.defaultProps = { val: 0 }
+
+	// class App extends React.Component {
+	//     constructor() {
+	//         super();
+	//         this.state={
+	//             red: 0,
+	//             green: 0,
+	//             blue: 0
+	//         }
+	//     }
+	//     updateTheState (e){
+	//         this.setState({
+	//             red: ReactDOM.findDOMNode(this.refs.red.refs.inp).value,
+	//             green: ReactDOM.findDOMNode(this.refs.green.refs.inp).value,
+	//             blue: ReactDOM.findDOMNode(this.refs.blue.refs.inp).value
+	//         })
+	//     }
+	//     render(){
+	//         return (
+	//             <div>
+	//                 <Slider ref="red" sliderUpdateTheState={this.updateTheState} />
+	//                 {this.state.red}
+	//                 <br />
+	//                 <Slider ref="green" sliderUpdateTheState={this.updateTheState} />
+	//                 {this.state.green}
+	//                 <br />
+	//                 <Slider ref="blue" sliderUpdateTheState={this.updateTheState} />
+	//                 {this.state.blue}
+	//                 <br />
+	//             </div>
+	//         );
+	//     }
+	// }
+	//
+	// class Slider extends React.Component {
+	//   render(){
+	//     return (
+	//         <div>
+	//         <input ref="inp" type="range"
+	//           min="0"
+	//           max="255"
+	//           onChange={this.props.sliderUpdateTheState} />
+	//         </div>
+	//     );
+	//   }
+	// }
 
 	// I used h1 here instead of having the text appear in a div alone since it wasn't
 	// rendering the text when I tried the latter way. Using proper h1 or even p tags
 	// worked fine though.
-
-	var WIDGET = function WIDGET(props) {
-	    return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement('input', { type: 'text', onChange: props.widgetUpdateTheState }),
-	        _react2.default.createElement(
-	            'h1',
-	            null,
-	            props.widgetTxt
-	        )
-	    );
-	};
+	// const WIDGET = (props) => {
+	//     return (
+	//         <div>
+	//             <input type="text" onChange={props.widgetUpdateTheState} />
+	//             <h1>{props.widgetTxt}</h1>
+	//         </div>
+	//     );
+	// }
 
 	// App.propTypes = {
 	//     txt: React.PropTypes.string
@@ -19822,6 +19977,7 @@
 
 	// Stateless function:
 	// const App = () => <div>Hi</div>
+
 	exports.default = App;
 
 /***/ }
